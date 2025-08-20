@@ -1,0 +1,20 @@
+#!/bin/bash
+
+read -p "Enter your username: " username
+
+if [ -z "$username" ]; then
+  echo "Username cannot be empty."
+  exit 1
+fi
+
+FILE="./bin/config/apps.json"
+
+if [ ! -f "$FILE" ]; then
+  echo "File $FILE does not exist."
+  exit 1
+fi
+
+# Replace /home/<anything>/.' with /home/<username>/.' in the file
+sed -i "s|/home/[^/]\+/\.|/home/$username/.|g" "$FILE"
+
+echo "Replacement complete."

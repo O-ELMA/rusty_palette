@@ -1,0 +1,232 @@
+[
+  {
+    "name": "freetube",
+    "config": {
+      "paths": ["/home/$USER/.config/FreeTube/settings.db"],
+      "regex": [
+        {
+          "expression": "\"_id\":\"baseTheme\",\"value\":\"([^\"]+)\"",
+          "target": "\"_id\":\"baseTheme\",\"value\":\"{color}\"",
+          "key": "{color}"
+        },
+        {
+          "expression": "\"_id\":\"mainColor\",\"value\":\"([^\"]+)\"",
+          "target": "\"_id\":\"mainColor\",\"value\":\"{color}\"",
+          "key": "{color}"
+        },
+        {
+          "expression": "\"_id\":\"secColor\",\"value\":\"([^\"]+)\"",
+          "target": "\"_id\":\"secColor\",\"value\":\"{color}\"",
+          "key": "{color}"
+        }
+      ],
+      "theme_mapping": {
+        "catppuccin": [
+          "catppuccinMocha",
+          "CatppuccinMochaGreen",
+          "CatppuccinMochaLavender"
+        ],
+        "dracula": [
+          "dracula",
+          "DraculaPurple",
+          "DraculaPurple"
+        ],
+        "everblush": [
+          "dark",
+          "CatppuccinFrappeGreen",
+          "CatppuccinFrappeGreen"
+        ],
+        "everforest": [
+          "dark",
+          "CatppuccinFrappeGreen",
+          "CatppuccinFrappeGreen"
+        ],
+        "gruvbox": [
+          "gruvboxDark",
+          "GruvboxDarkGreen",
+          "GruvboxDarkGreen"
+        ],
+        "nord": [
+          "nordic",
+          "DeepPurple",
+          "DeepPurple"
+        ],
+        "rose_pine": [
+          "catppuccinMocha",
+          "CatppuccinFrappePink",
+          "CatppuccinFrappePink"
+        ],
+        "tokyonight": [
+          "catppuccinMocha",
+          "Purple",
+          "Purple"
+        ],
+        "kanagawa": [
+          "catppuccinMocha",
+          "CatppuccinFrappeSapphire",
+          "CatppuccinFrappeSapphire"
+        ]
+      }
+    }
+  },
+  {
+    "name": "folder_icon",
+    "config": {
+      "command": "papirus-folders -C {color} --theme Papirus-Dark",
+      "key": "{color}",
+      "theme_mapping": {
+        "catppuccin": "blue",
+        "dracula": "indigo",
+        "everblush": "green",
+        "everforest": "bluegrey",
+        "gruvbox": "green",
+        "nord": "nordic",
+        "rose_pine": "nordic",
+        "tokyonight": "violet",
+        "kanagawa": "bluegrey"
+      }
+    }
+  },
+  {
+    "name": "vesktop",
+    "config": {
+      "paths": ["/home/$USER/.config/vesktop/settings/settings.json"],
+      "regex": [
+        {
+          "expression": "\"enabledThemes\"\\s*:\\s*\\[\\s*((?:.|\\n)*?)\\s*\\]",
+          "target": "\"enabledThemes\": [\"{color}.css\"]",
+          "key": "{color}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "nvim",
+    "config": {
+      "paths": ["/home/$USER/.config/nvim/lua/themes/init.lua"],
+      "regex": [
+        {
+          "expression": "M\\.color\\s*=\\s*'([^']+)'",
+          "target": "M.color = '{color}'",
+          "key": "{color}"
+        }
+      ],
+      "theme_mapping": {
+        "catppuccin": "catppuccin",
+        "dracula": "dracula",
+        "everblush": "everblush",
+        "everforest": "everforest",
+        "gruvbox": "gruvbox",
+        "nord": "nord",
+        "rose_pine": "rose-pine",
+        "tokyonight": "tokyonight",
+        "kanagawa": "kanagawa"
+      }
+    }
+  },
+  {
+    "name": "alacritty",
+    "config": {
+      "paths": ["/home/$USER/.config/alacritty/alacritty.toml"],
+      "regex": [
+        {
+          "expression": "~\\/\\.config\\/alacritty\\/themes\\/([^\\/]+)\\.toml",
+          "target": "~/.config/alacritty/themes/{theme}.toml",
+          "key": "{theme}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "btop",
+    "config": {
+      "paths": ["/home/$USER/.config/btop/btop.conf"],
+      "regex": [
+        {
+          "expression": "color_theme\\s*=\\s*\"([^\"]+)\"",
+          "target": "color_theme = \"{theme}\"",
+          "key": "{theme}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "rofi",
+    "config": {
+      "paths": [
+        "/home/$USER/.config/rofi/config.rasi",
+        "/home/$USER/.config/rofi/config_menu.rasi"
+      ],
+      "regex": [
+        {
+          "expression": "@import\\s+\"~\\/\\.config\\/rofi\\/themes\\/([^\\/\\\"]+)\\.rasi\"",
+          "target": "@import \"~/.config/rofi/themes/{theme}.rasi\"",
+          "key": "{theme}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "gtk2",
+    "config": {
+      "paths": ["/home/$USER/.gtkrc-2.0"],
+      "regex": [
+        {
+          "expression": "gtk-theme-name\\s*=\\s*\"([^\"]+)\"",
+          "target": "gtk-theme-name = \"{theme}\"",
+          "key": "{theme}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "gtk3",
+    "config": {
+      "paths": ["/home/$USER/.config/gtk-3.0/settings.ini"],
+      "regex": [
+        {
+          "expression": "gtk-theme-name\\s*=\\s*([^\\s]+)",
+          "target": "gtk-theme-name = {theme}",
+          "key": "{theme}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "gtk4",
+    "config": {
+      "paths": ["/home/$USER/.config/gtk-4.0/settings.ini"],
+      "regex": [
+        {
+          "expression": "gtk-theme-name\\s*=\\s*([^\\s]+)",
+          "target": "gtk-theme-name = {theme}",
+          "key": "{theme}"
+        }
+      ]
+    }
+  },
+  {
+    "name": "vscodium",
+    "config": {
+      "paths": ["/home/$USER/.config/VSCodium/User/settings.json"],
+      "regex": [
+        {
+          "expression": "workbench\\.colorTheme\":\\s*\"[^\"]+\"",
+          "target": "workbench.colorTheme\": \"{theme}\"",
+          "key": "{theme}"
+        }
+      ],
+      "theme_mapping": {
+        "catppuccin": "Catppuccin Macchiato",
+        "dracula": "Dracula Theme",
+        "everblush": "Everblush",
+        "everforest": "Everforest Dark",
+        "gruvbox": "Gruvbox Dark Hard",
+        "nord": "Nord",
+        "rose_pine": "Rosé Pine",
+        "tokyonight": "Tokyo Night",
+        "kanagawa": "Kanagawa Wave"
+      }
+    }
+  }
+]
