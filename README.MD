@@ -23,7 +23,7 @@ A Rust tool for applying a set of themes and wallpapers to your system and apps 
 This command should install all 3 packages above if you're using an arch-based system:
 
    ```bash 
-   sudo pacman -S rustup feh papirus-folders && rustup default stable
+   yay -S rustup feh papirus-folders --noconfirm && rustup default stable
    ```
 
 ---

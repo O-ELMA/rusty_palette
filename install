@@ -1,20 +1,71 @@
 #!/bin/bash
 
-read -p "Enter your username: " username
+# Logging functions ─────────────────────────────────────────────────────────────────────
+log() {
+    echo -e "\033[1;36m💡 [INFO]\033[0m $1"
+}
+success() {
+    echo -e "\033[1;32m✅ [SUCCESS]\033[0m $1"
+}
+warning() {
+    echo -e "\033[1;33m⚠️  [WARNING]\033[0m $1"
+}
+line() {
+    echo "────────────────────────────────────────────────────────────────────────"
+}
 
-if [ -z "$username" ]; then
-  echo "Username cannot be empty."
-  exit 1
+# 0. Init logic ─────────────────────────────────────────────────────────────────────────
+clear
+warning "This will override your rofi configuration, are you sure you want to continue?"
+read -p "Are you sure you want to continue? [y/N]: " confirm
+
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    log "Aborted."
+    exit 1
+fi
+line
+
+# 2. Copy themes to the appropriate dirs ─────────────────────────────────────────────────
+
+# Check if alacritty is installed
+if command -v alacritty >/dev/null 2>&1; then
+    mkdir -p ~/.config/alacritty/themes && cp ./themes/alacritty/* ~/.config/alacritty/themes
 fi
 
-FILE="./bin/config/apps.json"
-
-if [ ! -f "$FILE" ]; then
-  echo "File $FILE does not exist."
-  exit 1
+# Check if btop is installed
+if command -v btop >/dev/null 2>&1; then
+    mkdir -p ~/.config/btop/themes && cp ./themes/btop/* ~/.config/btop/themes
 fi
 
-# Replace /home/<anything>/.' with /home/<username>/.' in the file
-sed -i "s|/home/[^/]\+/\.|/home/$username/.|g" "$FILE"
+# Check if rofi is installed
+if command -v rofi >/dev/null 2>&1; then
+    mkdir -p ~/.config/rofi/themes && cp -r ./themes/rofi/* ~/.config/rofi
+fi
 
-echo "Replacement complete."
+# Check if vesktop is installed
+if command -v vesktop >/dev/null 2>&1; then
+    mkdir -p ~/.config/vesktop/themes && cp ./themes/vesktop/* ~/.config/vesktop/themes
+fi
+
+# Copy wallpapers
+mkdir -p ~/wallpapers               && cp    ./themes/wallpapers/*  ~/wallpapers
+
+log "Copying gtk themes to /usr/share/thems requires root access"
+sudo cp -r ./themes/gtk/* /usr/share/themes
+line
+
+# 3. Add theme import to alacritty ────────────────────────────────────────────────────────
+grep -qF '~/.config/alacritty/themes/' ~/.config/alacritty/alacritty.toml || sed -i '1igeneral.import = ["~/.config/alacritty/themes/gruvbox.toml"]' ~/.config/alacritty/alacritty.toml
+
+
+# 4. Install themes on vscodium ───────────────────────────────────────────────────────────
+log "Installing Vscodium themes"
+xargs -a ./themes/vscodium/extensions -n1 codium --install-extension
+line
+
+# 5. Good lucks ───────────────────────────────────────────────────────────────────────────
+warning "If you're using neovim, you'll have to copy the themes dir and configure it yourself, since it depends hugely on how you have set it up"
+line
+
+success "Done!"
+line
