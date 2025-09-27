@@ -9,9 +9,8 @@ pub struct Theme {
 }
 
 // Defining apps.json structure ───────────────────────────────
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 #[serde(untagged)]
-#[derive(Clone)]
 pub enum ThemeMappingType {
     Arr(Vec<String>),
     Str(String)
@@ -26,7 +25,6 @@ pub struct Regex {
 
 #[derive(Deserialize)]
 #[serde(default)]
-
 pub struct Config {
     pub paths: Option<Vec<String>>,
     pub regex: Option<Vec<Regex>>,

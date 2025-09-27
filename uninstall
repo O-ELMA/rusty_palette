@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Remove themes and config import
+sed -i '/general\.import = \["~\/\.config\/alacritty\/themes\/.*\.toml"\]/d' ~/.config/alacritty/alacritty.toml
+
+configs=(
+    alacritty
+    btop
+    rofi
+    vesktop
+)
+for config in "${configs[@]}"; do
+    rm -rf "$HOME/.config/$config/themes"
+done
+
+# Remove GTK themes
+themes=(
+    catppuccin
+    everblush
+    gruvbox
+    nord
+    tokyonight
+    dracula
+    everforest
+    kanagawa
+    rose_pine
+)
+for theme in "${themes[@]}"; do
+    sudo rm -rf "/usr/share/themes/$theme"
+done
+
+# Remove wallpapers
+rm -rf ~/wallpapers
+
+# Uninstall VSCodium extensions
+if command -v codium >/dev/null 2>&1; then
+    extensions=(
+        catppuccin.catppuccin-vsc
+        dracula-theme.theme-dracula
+        enkia.tokyo-night
+        jdinhlife.gruvbox
+        mangeshrex.everblush
+        metaphore.kanagawa-vscode-color-theme
+        mvllow.rose-pine
+        sainnhe.everforest
+    )
+    for ext in "${extensions[@]}"; do
+        codium --uninstall-extension "$ext"
+    done
+fi
+
+# Uninstall rusty_palette
+cargo uninstall rusty_palette
+
+echo "rusty_palette was uninstalled successfully"

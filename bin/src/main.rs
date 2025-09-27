@@ -10,13 +10,7 @@ use structs::{App, Theme};
 
 // Helpers ──────────────────────────────────────────────────────────────────────────────
 mod helpers;
-use helpers::{
-    parse_config,
-    prompt_user,
-    set_apps_theme,
-    set_folder_icon_color,
-    set_wallpapers,
-};
+use helpers::{parse_config, prompt_user, set_apps_theme, set_folder_icon_color, set_wallpapers};
 
 // Constants ────────────────────────────────────────────────────────────────────────────
 const APPS_JSON: &str = include_str!("../config/apps.json");

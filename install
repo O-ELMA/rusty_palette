@@ -15,15 +15,24 @@ line() {
 }
 
 # 0. Init logic ─────────────────────────────────────────────────────────────────────────
-clear
-warning "This will override your rofi configuration, are you sure you want to continue?"
-read -p "Are you sure you want to continue? [y/N]: " confirm
-
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    log "Aborted."
-    exit 1
-fi
 line
+log "Compiling the app"
+cd ./bin
+cargo install --path .
+cd ..
+line
+
+# Check if rofi is installed
+if command -v rofi >/dev/null 2>&1; then
+    warning "This will override your rofi configuration, make sure you backup your configuration file first."
+    read -p "Are you sure you want to continue? [y/N]: " confirm
+
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        log "Aborted."
+        exit 1
+    fi
+    line
+fi
 
 # 2. Copy themes to the appropriate dirs ─────────────────────────────────────────────────
 

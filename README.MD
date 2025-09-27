@@ -1,13 +1,22 @@
 # **Rusty Palette** ✨
 
-A Rust tool for applying a set of themes and wallpapers to your system and apps via a configuration file.
+A Rust **CLI** tool for applying a set of themes and wallpapers to your system and apps via a configuration file.
+
+![Demo](assets/demo.png)
 
 ## **Overview** 🌟
 
 **Rusty Palette** applies visual customizations from JSON configs, including:
 
 1. Setting wallpapers.
-2. Changing system app themes.
+2. Changing the following app themes
+   - FreeTube
+   - Vesktop
+   - Neovim
+   - Alacritty
+   - Btop
+   - Rofi
+   - Vscodium
 3. Customizing Papirus Folder colors.
 
 ---
@@ -33,17 +42,23 @@ This command should install all 3 packages above if you're using an arch-based s
 1. **Install**:
 
    ```bash
-   git clone https://github.com/O-ELMA/rusty_palette.git && cd rusty_palette && bash ./install && cd ./bin && cargo build --release && chmod +x ./target/release/rusty_palette && mv ./target/release/rusty_palette ../rusty_palette && cd ..
+   git clone https://github.com/O-ELMA/rusty_palette.git && cd rusty_palette && bash ./install
    ```
 
 2. **Run the Program**:
 
    ```bash
-   ./rusty_palette
+   rusty_palette
+   rusty_palette Tokyo Night #mentioninig the name of the theme will set it for you
    ```
 
-   Once you press enter, this will apply the selected theme, wallpapers, and icon color changes.
+3. **Uninstall**:
 
+   Run the uninstall script
+
+   ```bash
+   bash ./uninstall
+   ```
 ---
 
 ## **Configuration** ⚙️
