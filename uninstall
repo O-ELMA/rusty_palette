@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Logging functions ─────────────────────────────────────────────────────────────────────
+log() {
+    echo -e "\033[1;36m💡 [INFO]\033[0m $1"
+}
+success() {
+    echo -e "\033[1;32m✅ [SUCCESS]\033[0m $1"
+}
+warning() {
+    echo -e "\033[1;33m⚠️  [WARNING]\033[0m $1"
+}
+line() {
+    echo "────────────────────────────────────────────────────────────────────────"
+}
+
+# Uninstall rusty_palette ────────────────────────────────────────────────────────────────────
+line
+log "Uninstalling the app"
+cargo uninstall rusty_palette
+success "rusty_palette was uninstalled successfully"
+line
+
+# Remove themes and config import ─────────────────────────────────────────────────────────
+log "Deleting theme folders from the packages .config folder"
+line
+sed -i '/general\.import = \["~\/\.config\/alacritty\/themes\/.*\.toml"\]/d' ~/.config/alacritty/alacritty.toml
+
+configs=(
+    alacritty
+    btop
+    rofi
+    vesktop
+)
+for config in "${configs[@]}"; do
+    rm -rf "$HOME/.config/$config/themes"
+done
+
+# Remove wallpapers ─────────────────────────────────────────────────────────────────────────
+log "Deleting wallpapers from ~/wallpapers"
+line
+rm -rf ~/wallpapers
+
+# Remove GTK themes ─────────────────────────────────────────────────────────────────────────
+log "Deleting GTK themes in /usr/share/themes/"
+warn "might require root access"
+line
+themes=(
+    catppuccin
+    everblush
+    gruvbox
+    nord
+    tokyonight
+    dracula
+    everforest
+    kanagawa
+    rose_pine
+)
+for theme in "${themes[@]}"; do
+    sudo rm -rf "/usr/share/themes/$theme"
+done
+line
+
+# Uninstall VSCodium extensions ─────────────────────────────────────────────────────────────
+log "Uninstalling Vscodium themes"
+if command -v codium >/dev/null 2>&1; then
+    extensions=(
+        catppuccin.catppuccin-vsc
+        dracula-theme.theme-dracula
+        enkia.tokyo-night
+        jdinhlife.gruvbox
+        mangeshrex.everblush
+        metaphore.kanagawa-vscode-color-theme
+        mvllow.rose-pine
+        sainnhe.everforest
+    )
+    for ext in "${extensions[@]}"; do
+        codium --uninstall-extension "$ext"
+    done
+fi
+line
+
+# 5. Good lucks ───────────────────────────────────────────────────────────────────────────
+warning "If you have configured neovim to use the themes, you might want to delete them from there as well"
+line
+
+success "Done!"
+line

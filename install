@@ -15,18 +15,28 @@ line() {
 }
 
 # 0. Init logic ─────────────────────────────────────────────────────────────────────────
-clear
-warning "This will override your rofi configuration, are you sure you want to continue?"
-read -p "Are you sure you want to continue? [y/N]: " confirm
-
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    log "Aborted."
-    exit 1
-fi
+line
+log "Compiling the app"
+cd ./bin
+cargo install --path .
+cd ..
 line
 
-# 2. Copy themes to the appropriate dirs ─────────────────────────────────────────────────
+# Check if rofi is installed
+if command -v rofi >/dev/null 2>&1; then
+    warning "This will override your rofi configuration, make sure you backup your configuration file first."
+    read -p "Are you sure you want to continue? [y/N]: " confirm
 
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        log "Aborted."
+        exit 1
+    fi
+    line
+fi
+
+# 2. Copy themes to the appropriate dirs ───────────────────────────────────────────────────
+log "Copying themes to the packages .config folder"
+line
 # Check if alacritty is installed
 if command -v alacritty >/dev/null 2>&1; then
     mkdir -p ~/.config/alacritty/themes && cp ./themes/alacritty/* ~/.config/alacritty/themes
@@ -47,10 +57,15 @@ if command -v vesktop >/dev/null 2>&1; then
     mkdir -p ~/.config/vesktop/themes && cp ./themes/vesktop/* ~/.config/vesktop/themes
 fi
 
+
 # Copy wallpapers
+log "Copying wallapapers to ~/wallpapers"
+line
 mkdir -p ~/wallpapers               && cp    ./themes/wallpapers/*  ~/wallpapers
 
-log "Copying gtk themes to /usr/share/thems requires root access"
+## Copy GTK themes ────────────────────────────────────────────────────────────────────────
+log "Copying gtk themes to /usr/share/themes"
+warn "might require root access"
 sudo cp -r ./themes/gtk/* /usr/share/themes
 line
 
@@ -64,7 +79,7 @@ xargs -a ./themes/vscodium/extensions -n1 codium --install-extension
 line
 
 # 5. Good lucks ───────────────────────────────────────────────────────────────────────────
-warning "If you're using neovim, you'll have to copy the themes dir and configure it yourself, since it depends hugely on how you have set it up"
+warning "If you're using neovim, you'll have to copy the themes folder and configure it yourself, since it depends hugely on how you have set it up"
 line
 
 success "Done!"
