@@ -155,7 +155,8 @@
     "config": {
       "paths": [
         "/home/$USER/.config/rofi/config.rasi",
-        "/home/$USER/.config/rofi/config_menu.rasi"
+        "/home/$USER/.config/rofi/config_menu.rasi",
+        "/home/$USER/.config/rofi/config_input.rasi"
       ],
       "regex": [
         {

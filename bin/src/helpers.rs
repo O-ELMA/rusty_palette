@@ -1,21 +1,17 @@
 // Standards ───────────────────────────────────────────────────────────────────────────
 use std::{
-    borrow::Cow,
     collections::HashMap,
-    env,
-    fs::{self},
+    env, fs,
     io::{self, Stdin},
     process::Command,
 };
 
 // Crates ───────────────────────────────────────────────────────────────────────────────
 use rand::{rng, seq::IndexedRandom};
-use regex::Regex;
 use serde::Deserialize;
-use serde_json;
 
 // Structs ──────────────────────────────────────────────────────────────────────────────
-use crate::structs::{App, Theme, ThemeMappingType};
+use crate::structs::{App, CompiledRegex, Theme, ThemeMappingType};
 
 // Other ───────────────────────────────────────────────────────────────────────────────
 pub fn parse_config<T>(json_str: &str) -> T
@@ -28,17 +24,24 @@ where
     }
 }
 
-pub fn prompt_user<'a>(themes: &'a HashMap<String, Theme>) -> &'a Theme {
-    let theme_names: Vec<&String> = themes.keys().collect();
+pub fn prompt_user(themes: &HashMap<String, Theme>) -> &Theme {
     let args: Vec<String> = env::args().skip(1).collect();
-    let selected: String;
 
     // Called with allowrgs
-    if args.len() >= 1 {
-        selected = args.join(" ").trim().into();
+    if !args.is_empty() {
+        let selected = args.join(" ");
+        let selected = selected.trim();
+        themes.get(selected).unwrap_or_else(|| {
+            panic!(
+                "❌ Couldn't find [{}] among the available themes {:?}",
+                selected,
+                themes.keys()
+            )
+        })
     }
     // Called without args
     else {
+        let theme_names: Vec<&String> = themes.keys().collect();
         println!("✨ Choose a theme to apply by typing its number:");
         for (i, name) in theme_names.iter().enumerate() {
             println!("{}. {}", i + 1, name);
@@ -48,81 +51,74 @@ pub fn prompt_user<'a>(themes: &'a HashMap<String, Theme>) -> &'a Theme {
         let stdin: Stdin = io::stdin();
         let mut input: String = String::new();
         let _ = stdin.read_line(&mut input);
-        input = input.trim().to_owned(); // Removes the '\n' caused by the user pressing 'enter'
+        let input = input.trim(); // Removes the '\n' caused by the user pressing 'enter'
 
-        selected = if input.is_empty() {
+        let selected = if input.is_empty() {
             let mut rng = rng();
-            theme_names.choose(&mut rng).unwrap().to_string()
+            theme_names.choose(&mut rng).unwrap()
         } else {
             let index: usize = input.parse().expect("❌ Please enter a valid number.");
             if index == 0 || index > theme_names.len() {
                 panic!("❌ Number should be between 1 and {}.", theme_names.len());
             }
-            theme_names[index - 1].to_string()
+            theme_names[index - 1]
         };
-    };
 
-    let theme: &Theme = themes.get(&selected).unwrap_or_else(|| {
-        panic!(
-            "❌ Couldn't find [{}] among the available themes {:?}",
-            selected,
-            themes.keys()
-        )
-    });
-
-    theme
+        themes.get(selected).unwrap()
+    }
 }
 
-pub fn set_apps_theme(theme_name: String, app: &App) {
+pub fn set_apps_theme(theme_name: &str, app: &App, compiled_regexes: Option<&Vec<CompiledRegex>>) {
     let user = env::var("USER")
         .unwrap_or_else(|error| panic!("❌ USER env variable not set: [{}]", error));
 
-    for path in app.config.paths.clone().unwrap() {
+    let paths = app
+        .config
+        .paths
+        .as_ref()
+        .unwrap_or_else(|| panic!("❌ Couldn't find [paths] in the app [{}]", app.name));
+
+    let regexes = compiled_regexes.as_ref().unwrap_or_else(|| {
+        panic!(
+            "❌ Couldn't find compiled regexes for the app [{}]",
+            app.name
+        )
+    });
+
+    let targets: Vec<String> = match &app.config.theme_mapping {
+        Some(theme_mapping) => match theme_mapping.get(theme_name) {
+            Some(ThemeMappingType::Arr(arr)) => arr.to_owned(),
+            Some(ThemeMappingType::Str(str)) => vec![str.clone(); regexes.len()],
+            _ => panic!(
+                "❌ [{}]'s theme_mapping needs to be in a String-to-Array format.",
+                app.name
+            ),
+        },
+        None => {
+            let mut targets = Vec::with_capacity(regexes.len());
+            targets.resize(regexes.len(), theme_name.to_string());
+            targets
+        }
+    };
+
+    for path in paths {
         let clean_path = path.replace("$USER", &user);
 
-        let file_content: String = fs::read_to_string(&clean_path).unwrap_or_else(|error| {
+        let mut content = fs::read_to_string(&clean_path).unwrap_or_else(|error| {
             panic!(
                 "❌ Couldn't read the file [{}] because [{}]",
                 clean_path, error
             )
         });
 
-        let regexes = app
-            .config
-            .regex
-            .as_ref()
-            .unwrap_or_else(|| panic!("❌ Couldn't find [regex] in the app [{}]", app.name));
-
-        let targets: Vec<String> = if let Some(theme_mapping) = &app.config.theme_mapping {
-            match theme_mapping.get(&theme_name) {
-                Some(ThemeMappingType::Arr(arr)) => arr.to_owned(),
-                Some(ThemeMappingType::Str(str)) => vec![str.clone(); regexes.len()],
-                _ => panic!(
-                    "❌ [{}]'s theme_mapping needs to be in a String-to-Array format.",
-                    app.name
-                ),
-            }
-        } else {
-            // repeat theme_name for each regex
-            vec![theme_name.clone(); regexes.len()]
-        };
-
-        let mut content = Cow::from(file_content.clone());
-
-        for (i, regex) in regexes.iter().enumerate() {
-            let target = regex.target.replace(&regex.key, &targets[i]);
-
-            let re = Regex::new(&regex.expression).unwrap_or_else(|error| {
-                panic!(
-                    "❌ The regex [{}] failed because [{}]",
-                    regex.expression, error
-                )
-            });
-
-            content = Cow::from(re.replace(&content, &target).into_owned());
+        for (i, compiled_regex) in regexes.iter().enumerate() {
+            let target = compiled_regex
+                .target
+                .replace(&compiled_regex.key, &targets[i]);
+            content = compiled_regex.regex.replace(&content, &target).into_owned();
         }
 
-        fs::write(&clean_path, content.into_owned()).unwrap_or_else(|error| {
+        fs::write(&clean_path, content).unwrap_or_else(|error| {
             panic!(
                 "❌ Couldn't write to the file [{}] because [{}]",
                 clean_path, error
@@ -135,7 +131,7 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
     let mapped_theme: String = app
         .config
         .theme_mapping
-        .clone()
+        .as_ref()
         .unwrap()
         .get(theme_name)
         .map(|res| match res {
@@ -144,7 +140,7 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
         })
         .unwrap_or_else(|| {
             panic!(
-                "Couldn't find [{}] among the theme_mapping in the app [{}]",
+                "❌ Couldn't find [{}] among the theme_mapping in the app [{}]",
                 theme_name, app.name
             )
         });
@@ -152,7 +148,7 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
     let clean_command: String = app
         .config
         .command
-        .clone()
+        .as_ref()
         .unwrap()
         .replace(&app.config.key.clone().unwrap(), &mapped_theme);
 
@@ -172,7 +168,7 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
     };
 }
 
-pub fn set_wallpapers(wallpapers: &Vec<String>) {
+pub fn set_wallpapers(wallpapers: &[String]) {
     let _output = Command::new("sh")
         .arg("-c")
         .arg(format!("feh --bg-fill -z {}*", wallpapers.join(" ")))

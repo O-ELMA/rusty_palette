@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use serde::Deserialize;
+use regex::Regex as RegexPattern;
 
 // Defining themes.json structure ────────────────────────────
 #[derive(Deserialize, Debug)]
@@ -8,12 +9,20 @@ pub struct Theme {
     pub wallpapers: Vec<String>,
 }
 
+// Compiled regex structure ───────────────────────────────────
+#[derive(Debug, Clone)]
+pub struct CompiledRegex {
+    pub regex: RegexPattern,
+    pub target: String,
+    pub key: String,
+}
+
 // Defining apps.json structure ───────────────────────────────
 #[derive(Deserialize, Clone)]
 #[serde(untagged)]
 pub enum ThemeMappingType {
     Arr(Vec<String>),
-    Str(String)
+    Str(String),
 }
 
 #[derive(Deserialize)]
@@ -23,7 +32,7 @@ pub struct Regex {
     pub key: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 #[serde(default)]
 pub struct Config {
     pub paths: Option<Vec<String>>,
@@ -33,20 +42,27 @@ pub struct Config {
     pub key: Option<String>,
 }
 
-impl Default for Config {
-    fn default() -> Config {
-        Config {
-            paths: None,
-            regex: None,
-            theme_mapping: None,
-            command: None,
-            key: None,
-        }
-    }
-}
-
 #[derive(Deserialize)]
 pub struct App {
     pub name: String,
     pub config: Config,
+}
+
+impl App {
+    pub fn compile_regexes(&self) -> Option<Vec<CompiledRegex>> {
+        self.config.regex.as_ref().map(|regexes| {
+            regexes
+                .iter()
+                .map(|r| {
+                    let regex = RegexPattern::new(&r.expression)
+                        .unwrap_or_else(|_| panic!("❌ Failed to compile regex: [{}]", r.expression));
+                    CompiledRegex {
+                        regex,
+                        target: r.target.clone(),
+                        key: r.key.clone(),
+                    }
+                })
+                .collect()
+        })
+    }
 }
