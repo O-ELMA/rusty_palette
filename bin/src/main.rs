@@ -1,9 +1,6 @@
 // Standards ───────────────────────────────────────────────────────────────────────────
 use std::collections::HashMap;
 
-// Crates ───────────────────────────────────────────────────────────────────────────────
-use rayon::prelude::*;
-
 // Structs ──────────────────────────────────────────────────────────────────────────────
 mod structs;
 use structs::{App, CompiledRegex, Theme};
@@ -25,29 +22,27 @@ fn main() {
 
     // Pre-compile regexes for all apps
     let compiled_regexes: Vec<Option<Vec<CompiledRegex>>> =
-        apps.par_iter().map(|app| app.compile_regexes()).collect();
+        apps.iter().map(|app| app.compile_regexes()).collect();
 
     // 1- Set Wallpapers
     set_wallpapers(&theme.wallpapers[..]);
 
-    apps.par_iter()
-        .zip(compiled_regexes.par_iter())
-        .for_each(|(app, compiled)| {
-            // 2- Change each app's theme
-            if app.config.command.is_none() {
-                set_apps_theme(&theme.name, app, compiled.as_ref());
-            }
+    for (app, compiled) in apps.iter().zip(compiled_regexes.iter()) {
+        // 2- Change each app's theme
+        if app.config.command.is_none() {
+            set_apps_theme(&theme.name, app, compiled.as_ref());
+        }
 
-            // 3- Change Papirus Folders icons' color
-            else if app.name == "folder_icon" {
-                set_folder_icon_color(&theme.name, app);
-            }
+        // 3- Change Papirus Folders icons' color
+        else if app.name == "folder_icon" {
+            set_folder_icon_color(&theme.name, app);
+        }
 
-            else {
-                panic!(
-                    "❌ The App [{}] must be a new app that has the 'command' key but not named 'folder_icon'. You should handle it.",
-                    app.name
-                );
-            }
-        });
+        else {
+            panic!(
+                "❌ The App [{}] must be a new app that has the 'command' key but not named 'folder_icon'. You should handle it.",
+                app.name
+            );
+        }
+    }
 }

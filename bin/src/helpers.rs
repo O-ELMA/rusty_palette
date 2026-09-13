@@ -115,7 +115,7 @@ pub fn set_apps_theme(theme_name: &str, app: &App, compiled_regexes: Option<&Vec
             let target = compiled_regex
                 .target
                 .replace(&compiled_regex.key, &targets[i]);
-            content = compiled_regex.regex.replace(&content, &target).into_owned();
+            content = compiled_regex.regex.replace_all(&content, target.as_str()).into_owned();
         }
 
         fs::write(&clean_path, content).unwrap_or_else(|error| {
@@ -153,7 +153,11 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
         .replace(&app.config.key.clone().unwrap(), &mapped_theme);
 
     // command = papirus-folders -C {color} --theme Papirus-Dark
-    let output = Command::new("sh").arg("-c").arg(clean_command).output();
+    let mut parts = clean_command.split_whitespace();
+    let output = parts
+        .next()
+        .map(|binary| Command::new(binary).args(parts).output())
+        .unwrap_or_else(|| panic!("❌ folder_icon command is empty"));
 
     match output {
         Err(error) => panic!("❌ folder_icon command executed but failed: {}", error),
@@ -169,9 +173,16 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
 }
 
 pub fn set_wallpapers(wallpapers: &[String]) {
-    let _output = Command::new("sh")
-        .arg("-c")
-        .arg(format!("feh --bg-fill -z {}*", wallpapers.join(" ")))
+    let home = env::var("HOME")
+        .unwrap_or_else(|error| panic!("❌ HOME env variable not set: [{}]", error));
+
+    let output = Command::new("feh")
+        .args(["--bg-fill", "-z"])
+        .args(wallpapers.iter().map(|wp| wp.replace('~', &home)))
         .output()
         .unwrap_or_else(|error| panic!("❌ Error while executing feh: [{}]", error));
+
+    if !output.status.success() {
+        panic!("❌ feh failed: {}", String::from_utf8_lossy(&output.stderr));
+    }
 }
