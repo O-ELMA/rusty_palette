@@ -66,5 +66,5 @@ This command should install all 3 packages above if you're using an arch-based s
 
 The tool uses two configuration files:
 
-1. **`bin/config/apps.json`**: Specifies apps to customize and tells the code how to customize them. Do not touch it unless you know what you're doing.
-2. **`bin/config/themes.json`**: Contains theme names with wallpapers. Feel free to set the wallpaper paths there for each theme.
+1. **`bin/config/apps.toml`**: Specifies apps to customize and tells the code how to customize them. Do not touch it unless you know what you're doing.
+2. **`bin/config/themes.toml`**: Contains theme names with wallpapers. Feel free to set the wallpaper paths there for each theme.

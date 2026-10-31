@@ -1,0 +1,251 @@
+[[apps]]
+name = "freetube"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/FreeTube/settings.db",
+]
+
+[[apps.config.regex]]
+expression = "\"_id\":\"baseTheme\",\"value\":\"([^\"]+)\""
+target = "\"_id\":\"baseTheme\",\"value\":\"{color}\""
+key = "{color}"
+
+[[apps.config.regex]]
+expression = "\"_id\":\"mainColor\",\"value\":\"([^\"]+)\""
+target = "\"_id\":\"mainColor\",\"value\":\"{color}\""
+key = "{color}"
+
+[[apps.config.regex]]
+expression = "\"_id\":\"secColor\",\"value\":\"([^\"]+)\""
+target = "\"_id\":\"secColor\",\"value\":\"{color}\""
+key = "{color}"
+
+[apps.config.theme_mapping]
+"catppuccin" = [
+  "catppuccinMocha",
+  "CatppuccinMochaGreen",
+  "CatppuccinMochaLavender",
+]
+"dracula" = [
+  "dracula",
+  "DraculaPurple",
+  "DraculaPurple",
+]
+"everblush" = [
+  "dark",
+  "CatppuccinFrappeGreen",
+  "CatppuccinFrappeGreen",
+]
+"everforest" = [
+  "dark",
+  "CatppuccinFrappeGreen",
+  "CatppuccinFrappeGreen",
+]
+"gruvbox" = [
+  "gruvboxDark",
+  "GruvboxDarkGreen",
+  "GruvboxDarkGreen",
+]
+"nord" = [
+  "nordic",
+  "DeepPurple",
+  "DeepPurple",
+]
+"rose_pine" = [
+  "catppuccinMocha",
+  "CatppuccinFrappePink",
+  "CatppuccinFrappePink",
+]
+"tokyonight" = [
+  "catppuccinMocha",
+  "Purple",
+  "Purple",
+]
+"kanagawa" = [
+  "catppuccinMocha",
+  "CatppuccinFrappeSapphire",
+  "CatppuccinFrappeSapphire",
+]
+
+[[apps]]
+name = "vesktop"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/vesktop/settings/settings.json",
+]
+
+[[apps.config.regex]]
+expression = "\"enabledThemes\"\\s*:\\s*\\[\\s*((?:.|\\n)*?)\\s*\\]"
+target = "\"enabledThemes\": [\"{color}.css\"]"
+key = "{color}"
+
+[[apps]]
+name = "nvim"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/nvim/lua/themes/init.lua",
+]
+
+[[apps.config.regex]]
+expression = "M\\.color\\s*=\\s*'([^']+)'"
+target = "M.color = '{color}'"
+key = "{color}"
+
+[apps.config.theme_mapping]
+"catppuccin" = "catppuccin"
+"dracula" = "dracula"
+"everblush" = "everblush"
+"everforest" = "everforest"
+"gruvbox" = "gruvbox"
+"nord" = "nord"
+"rose_pine" = "rose-pine"
+"tokyonight" = "tokyonight"
+"kanagawa" = "kanagawa"
+
+[[apps]]
+name = "alacritty"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/alacritty/alacritty.toml",
+]
+
+[[apps.config.regex]]
+expression = "~\\/\\.config\\/alacritty\\/themes\\/([^\\/]+)\\.toml"
+target = "~/.config/alacritty/themes/{theme}.toml"
+key = "{theme}"
+
+[[apps]]
+name = "btop"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/btop/btop.conf",
+]
+
+[[apps.config.regex]]
+expression = "color_theme\\s*=\\s*\"([^\"]+)\""
+target = "color_theme = \"{theme}\""
+key = "{theme}"
+
+[[apps]]
+name = "rofi"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/rofi/config.rasi",
+  "/home/$USER/.config/rofi/config_menu.rasi",
+  "/home/$USER/.config/rofi/config_input.rasi",
+]
+
+[[apps.config.regex]]
+expression = "@import\\s+\"~\\/\\.config\\/rofi\\/themes\\/([^\\/\\\"]+)\\.rasi\""
+target = "@import \"~/.config/rofi/themes/{theme}.rasi\""
+key = "{theme}"
+
+[[apps]]
+name = "gtk2"
+
+[apps.config]
+paths = [
+  "/home/$USER/.gtkrc-2.0",
+]
+
+[[apps.config.regex]]
+expression = "gtk-theme-name\\s*=\\s*\"([^\"]+)\""
+target = "gtk-theme-name = \"{theme}\""
+key = "{theme}"
+
+[[apps]]
+name = "gtk3"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/gtk-3.0/settings.ini",
+]
+
+[[apps.config.regex]]
+expression = "gtk-theme-name\\s*=\\s*([^\\s]+)"
+target = "gtk-theme-name = {theme}"
+key = "{theme}"
+
+[[apps]]
+name = "gtk4"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/gtk-4.0/settings.ini",
+]
+
+[[apps.config.regex]]
+expression = "gtk-theme-name\\s*=\\s*([^\\s]+)"
+target = "gtk-theme-name = {theme}"
+key = "{theme}"
+
+[[apps]]
+name = "vscodium"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/VSCodium/User/settings.json",
+]
+
+[[apps.config.regex]]
+expression = "workbench\\.colorTheme\":\\s*\"[^\"]+\""
+target = "workbench.colorTheme\": \"{theme}\""
+key = "{theme}"
+
+[apps.config.theme_mapping]
+"catppuccin" = "Catppuccin Macchiato"
+"dracula" = "Dracula Theme"
+"everblush" = "Everblush"
+"everforest" = "Everforest Dark"
+"gruvbox" = "Gruvbox Dark Hard"
+"nord" = "Nord"
+"rose_pine" = "Rosé Pine"
+"tokyonight" = "Tokyo Night"
+"kanagawa" = "Kanagawa Wave"
+
+[[apps]]
+name = "opencode"
+
+[apps.config]
+paths = [
+  "/home/$USER/.config/opencode/cli.json",
+]
+
+[[apps.config.regex]]
+expression = "(\"theme\"\\s*:\\s*\\{[^}]*?\"name\"\\s*:\\s*\")[^\"]+"
+target = "${1}{theme}"
+key = "{theme}"
+
+[apps.config.theme_mapping]
+"catppuccin" = "catppuccin"
+"dracula" = "dracula"
+"everblush" = "everforest"
+"everforest" = "everforest"
+"gruvbox" = "gruvbox"
+"nord" = "nord"
+"rose_pine" = "rosepine"
+"tokyonight" = "tokyonight"
+"kanagawa" = "kanagawa"
+
+[[apps]]
+name = "folder_icon"
+
+[apps.config]
+command = "papirus-folders -C {color} --theme Papirus-Dark"
+key = "{color}"
+[apps.config.theme_mapping]
+"catppuccin" = "blue"
+"dracula" = "indigo"
+"everblush" = "green"
+"everforest" = "bluegrey"
+"gruvbox" = "green"
+"nord" = "nordic"
+"rose_pine" = "nordic"
+"tokyonight" = "violet"
+"kanagawa" = "bluegrey"

@@ -14,11 +14,11 @@ use serde::Deserialize;
 use crate::structs::{App, CompiledRegex, Theme, ThemeMappingType};
 
 // Other ───────────────────────────────────────────────────────────────────────────────
-pub fn parse_config<T>(json_str: &str) -> T
+pub fn parse_config<T>(config_str: &str) -> T
 where
     T: for<'a> Deserialize<'a>,
 {
-    match serde_json::from_str(json_str) {
+    match toml::from_str(config_str) {
         Err(error) => panic!("❌ Could not parse embedded config: [{}]", error),
         Ok(json) => json,
     }

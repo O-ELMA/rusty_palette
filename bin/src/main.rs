@@ -3,31 +3,31 @@ use std::collections::HashMap;
 
 // Structs ──────────────────────────────────────────────────────────────────────────────
 mod structs;
-use structs::{App, CompiledRegex, Theme};
+use structs::{AppsConfig, CompiledRegex, Theme};
 
 // Helpers ──────────────────────────────────────────────────────────────────────────────
 mod helpers;
 use helpers::{parse_config, prompt_user, set_apps_theme, set_folder_icon_color, set_wallpapers};
 
 // Constants ────────────────────────────────────────────────────────────────────────────
-const APPS_JSON: &str = include_str!("../config/apps.json");
-const THEMES_JSON: &str = include_str!("../config/themes.json");
+const APPS_TOML: &str = include_str!("../config/apps.toml");
+const THEMES_TOML: &str = include_str!("../config/themes.toml");
 
 // Main ────────────────────────────────────────────────────────────────────────────
 fn main() {
-    let themes: HashMap<String, Theme> = parse_config(THEMES_JSON);
+    let themes: HashMap<String, Theme> = parse_config(THEMES_TOML);
     let theme = prompt_user(&themes);
 
-    let apps: Vec<App> = parse_config(APPS_JSON);
+    let apps: AppsConfig = parse_config(APPS_TOML);
 
     // Pre-compile regexes for all apps
     let compiled_regexes: Vec<Option<Vec<CompiledRegex>>> =
-        apps.iter().map(|app| app.compile_regexes()).collect();
+        apps.apps.iter().map(|app| app.compile_regexes()).collect();
 
     // 1- Set Wallpapers
     set_wallpapers(&theme.wallpapers[..]);
 
-    for (app, compiled) in apps.iter().zip(compiled_regexes.iter()) {
+    for (app, compiled) in apps.apps.iter().zip(compiled_regexes.iter()) {
         // 2- Change each app's theme
         if app.config.command.is_none() {
             set_apps_theme(&theme.name, app, compiled.as_ref());

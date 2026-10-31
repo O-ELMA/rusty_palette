@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 use regex::Regex as RegexPattern;
 
-// Defining themes.json structure ────────────────────────────
+// Defining themes.toml structure ────────────────────────────
 #[derive(Deserialize, Debug)]
 pub struct Theme {
     pub name: String,
@@ -17,7 +17,7 @@ pub struct CompiledRegex {
     pub key: String,
 }
 
-// Defining apps.json structure ───────────────────────────────
+// Defining apps.toml structure ───────────────────────────────
 #[derive(Deserialize, Clone)]
 #[serde(untagged)]
 pub enum ThemeMappingType {
@@ -40,6 +40,11 @@ pub struct Config {
     pub theme_mapping: Option<HashMap<String, ThemeMappingType>>,
     pub command: Option<String>,
     pub key: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct AppsConfig {
+    pub apps: Vec<App>,
 }
 
 #[derive(Deserialize)]
