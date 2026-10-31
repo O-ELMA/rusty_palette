@@ -18,6 +18,7 @@ line() {
 line
 log "Uninstalling the app"
 cargo uninstall rusty_palette
+rm -f "$HOME/.cargo/bin/rusty_palette"
 success "rusty_palette was uninstalled successfully"
 line
 

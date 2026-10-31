@@ -28,21 +28,12 @@ fn main() {
     set_wallpapers(&theme.wallpapers[..]);
 
     for (app, compiled) in apps.apps.iter().zip(compiled_regexes.iter()) {
-        // 2- Change each app's theme
-        if app.config.command.is_none() {
-            set_apps_theme(&theme.name, app, compiled.as_ref());
-        }
-
-        // 3- Change Papirus Folders icons' color
-        else if app.name == "folder_icon" {
+        if app.name == "folder_icon" {
+            // 3- Change Papirus Folders icons' color
             set_folder_icon_color(&theme.name, app);
-        }
-
-        else {
-            panic!(
-                "❌ The App [{}] must be a new app that has the 'command' key but not named 'folder_icon'. You should handle it.",
-                app.name
-            );
+        } else {
+            // 2- Change each app's theme
+            set_apps_theme(&theme.name, app, compiled.as_ref());
         }
     }
 }

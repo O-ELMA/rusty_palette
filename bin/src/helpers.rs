@@ -3,6 +3,8 @@ use std::{
     collections::HashMap,
     env, fs,
     io::{self, Stdin},
+    os::unix::fs::symlink,
+    path::PathBuf,
     process::Command,
 };
 
@@ -20,7 +22,7 @@ where
 {
     match toml::from_str(config_str) {
         Err(error) => panic!("❌ Could not parse embedded config: [{}]", error),
-        Ok(json) => json,
+        Ok(config) => config,
     }
 }
 
@@ -145,31 +147,79 @@ pub fn set_folder_icon_color(theme_name: &str, app: &App) {
             )
         });
 
-    let clean_command: String = app
+    let icon_theme = app
         .config
-        .command
+        .icon_theme
         .as_ref()
-        .unwrap()
-        .replace(&app.config.key.clone().unwrap(), &mapped_theme);
+        .unwrap_or_else(|| panic!("❌ Couldn't find [icon_theme] in the app [{}]", app.name));
 
-    // command = papirus-folders -C {color} --theme Papirus-Dark
-    let mut parts = clean_command.split_whitespace();
-    let output = parts
-        .next()
-        .map(|binary| Command::new(binary).args(parts).output())
-        .unwrap_or_else(|| panic!("❌ folder_icon command is empty"));
+    let data_home = env::var("XDG_DATA_HOME")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| {
+            PathBuf::from(
+                env::var("HOME")
+                    .unwrap_or_else(|error| panic!("❌ HOME env variable not set: [{}]", error)),
+            )
+            .join(".local/share")
+        });
 
-    match output {
-        Err(error) => panic!("❌ folder_icon command executed but failed: {}", error),
-        Ok(output) => {
-            if !output.status.success() {
-                panic!(
-                    "❌ folder_icon command executed but failed: {}",
-                    String::from_utf8_lossy(&output.stderr)
-                );
+    let theme_dir = data_home.join("icons").join(icon_theme);
+    if !theme_dir.is_dir() {
+        panic!(
+            "❌ Couldn't find the user icon theme [{}]. Copy it into [{}] first.",
+            icon_theme,
+            theme_dir.display()
+        );
+    }
+
+    let markers = [
+        ("folder", format!("folder-{}", mapped_theme)),
+        ("user", format!("user-{}", mapped_theme)),
+    ];
+
+    let mut applied = 0usize;
+
+    for size in ["22x22", "24x24", "32x32", "48x48", "64x64"] {
+        let places = theme_dir.join(size).join("places");
+        let Ok(entries) = fs::read_dir(&places) else {
+            continue;
+        };
+
+        for entry in entries.flatten() {
+            let file_name = entry.file_name();
+            let Some(name) = file_name.to_str() else {
+                continue;
+            };
+
+            for (prefix, marker) in &markers {
+                let Some(rest) = name.strip_prefix(marker.as_str()) else {
+                    continue;
+                };
+                if !rest.starts_with('.') && !rest.starts_with('-') {
+                    continue;
+                }
+
+                let target_path = places.join(format!("{prefix}{rest}"));
+                let _ = fs::remove_file(&target_path);
+                symlink(name, &target_path).unwrap_or_else(|error| {
+                    panic!(
+                        "❌ Couldn't link [{}] to [{}] because [{}]",
+                        target_path.display(),
+                        name,
+                        error
+                    )
+                });
+                applied += 1;
             }
         }
-    };
+    }
+
+    if applied == 0 {
+        panic!(
+            "❌ The icon theme [{}] has no files for the color [{}]",
+            icon_theme, mapped_theme
+        );
+    }
 }
 
 pub fn set_wallpapers(wallpapers: &[String]) {

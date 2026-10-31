@@ -38,8 +38,7 @@ pub struct Config {
     pub paths: Option<Vec<String>>,
     pub regex: Option<Vec<Regex>>,
     pub theme_mapping: Option<HashMap<String, ThemeMappingType>>,
-    pub command: Option<String>,
-    pub key: Option<String>,
+    pub icon_theme: Option<String>,
 }
 
 #[derive(Deserialize)]

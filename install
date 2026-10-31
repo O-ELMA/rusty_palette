@@ -15,17 +15,60 @@ line() {
 }
 
 # 0. Init logic ─────────────────────────────────────────────────────────────────────────
+if [ ! -f "$(dirname "$0")/bin/Cargo.toml" ]; then
+    line
+    log "Fetching the repository"
+    tmp_dir=$(mktemp -d)
+    git clone --depth 1 https://github.com/O-ELMA/rusty_palette.git "$tmp_dir/rusty_palette" || {
+        warning "Could not clone the repository"
+        exit 1
+    }
+    bash "$tmp_dir/rusty_palette/install"
+    status=$?
+    rm -rf "$tmp_dir"
+    exit $status
+fi
+
 line
-log "Compiling the app"
-cd ./bin
-cargo install --path .
-cd ..
+log "Installing the app"
+line
+
+APP=rusty_palette
+REPO=O-ELMA/rusty_palette
+PREFIX="$HOME/.cargo/bin"
+
+case "$(uname -m)" in
+    x86_64|amd64)  target=x86_64-unknown-linux-gnu ;;
+    aarch64|arm64) target=aarch64-unknown-linux-gnu ;;
+    *)             warning "Unsupported architecture: $(uname -m)"; exit 1 ;;
+esac
+
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
+
+if curl -fsL "https://github.com/$REPO/releases/latest/download/$APP-$target.tar.gz" -o "$tmp_dir/$APP.tar.gz" 2>/dev/null; then
+    tar -xzf "$tmp_dir/$APP.tar.gz" -C "$tmp_dir"
+    mkdir -p "$PREFIX"
+    install -m 755 "$tmp_dir/$APP-$target/$APP" "$PREFIX/.$APP.new"
+    mv -f "$PREFIX/.$APP.new" "$PREFIX/$APP"
+else
+    command -v cargo >/dev/null 2>&1 || {
+        warning "No prebuilt binary and cargo is missing. Install Rust: https://rustup.rs"
+        exit 1
+    }
+    log "No prebuilt binary, compiling from source"
+    cargo install --path ./bin
+fi
 line
 
 # Check if rofi is installed
 if command -v rofi >/dev/null 2>&1; then
     warning "This will override your rofi configuration, make sure you backup your configuration file first."
-    read -p "Are you sure you want to continue? [y/N]: " confirm
+    confirm=""
+    read -r -p "Are you sure you want to continue? [y/N]: " confirm < /dev/tty || {
+        warning "No terminal available to ask for confirmation."
+        exit 1
+    }
 
     if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
         log "Aborted."

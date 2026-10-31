@@ -237,8 +237,8 @@ key = "{theme}"
 name = "folder_icon"
 
 [apps.config]
-command = "papirus-folders -C {color} --theme Papirus-Dark"
-key = "{color}"
+icon_theme = "Papirus-Dark"
+
 [apps.config.theme_mapping]
 "catppuccin" = "blue"
 "dracula" = "indigo"
