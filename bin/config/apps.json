@@ -70,24 +70,6 @@
     }
   },
   {
-    "name": "folder_icon",
-    "config": {
-      "command": "papirus-folders -C {color} --theme Papirus-Dark",
-      "key": "{color}",
-      "theme_mapping": {
-        "catppuccin": "blue",
-        "dracula": "indigo",
-        "everblush": "green",
-        "everforest": "bluegrey",
-        "gruvbox": "green",
-        "nord": "nordic",
-        "rose_pine": "nordic",
-        "tokyonight": "violet",
-        "kanagawa": "bluegrey"
-      }
-    }
-  },
-  {
     "name": "vesktop",
     "config": {
       "paths": ["/home/$USER/.config/vesktop/settings/settings.json"],
@@ -227,6 +209,48 @@
         "rose_pine": "Rosé Pine",
         "tokyonight": "Tokyo Night",
         "kanagawa": "Kanagawa Wave"
+      }
+    }
+  },
+  {
+    "name": "opencode",
+    "config": {
+      "paths": ["/home/$USER/.config/opencode/cli.json"],
+      "regex": [
+        {
+          "expression": "(\"theme\"\\s*:\\s*\\{[^}]*?\"name\"\\s*:\\s*\")[^\"]+",
+          "target": "${1}{theme}",
+          "key": "{theme}"
+        }
+      ],
+      "theme_mapping": {
+        "catppuccin": "catppuccin",
+        "dracula": "dracula",
+        "everblush": "everforest",
+        "everforest": "everforest",
+        "gruvbox": "gruvbox",
+        "nord": "nord",
+        "rose_pine": "rosepine",
+        "tokyonight": "tokyonight",
+        "kanagawa": "kanagawa"
+      }
+    }
+  },
+  {
+    "name": "folder_icon",
+    "config": {
+      "command": "papirus-folders -C {color} --theme Papirus-Dark",
+      "key": "{color}",
+      "theme_mapping": {
+        "catppuccin": "blue",
+        "dracula": "indigo",
+        "everblush": "green",
+        "everforest": "bluegrey",
+        "gruvbox": "green",
+        "nord": "nordic",
+        "rose_pine": "nordic",
+        "tokyonight": "violet",
+        "kanagawa": "bluegrey"
       }
     }
   }

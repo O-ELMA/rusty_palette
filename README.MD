@@ -17,6 +17,7 @@ A Rust **CLI** tool for applying a set of themes and wallpapers to your system a
    - Btop
    - Rofi
    - Vscodium
+   - OpenCode
 3. Customizing Papirus Folder colors.
 
 ---
